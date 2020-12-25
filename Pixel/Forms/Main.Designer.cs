@@ -41,7 +41,6 @@ namespace Pixel.Forms
             this.SuspendLayout();
             this.statusBar = new StatusBar();
             this.searchPhotosTextBox = new TextBox();
-            this.refreshPhotosButton = new Button();
             this.previousPageButton = new Button();
             this.nextPageButton = new Button();
             this.addRemoveFavoriteButton = new Button();
@@ -56,89 +55,76 @@ namespace Pixel.Forms
             //
             // statusBar
             //
-            //this.statusBar.Location = new Point(0, 499);
-            this.statusBar.Size = new Size(946, 20);
+            this.statusBar.Size = new Size(634, 20);
             this.statusBar.SizingGrip = false;
             this.statusBar.Font = new Font("Segoe UI", 8F);
             //
             // searchPhotosTextBox
             //
-            this.searchPhotosTextBox.Location = new Point(13, 13);
-            this.searchPhotosTextBox.Size = new Size(300, 22);
+            this.searchPhotosTextBox.Location = new Point(150, 13);
+            this.searchPhotosTextBox.Size = new Size(312, 22);
             this.searchPhotosTextBox.Font = new Font("Segoe UI", 8F);
             this.searchPhotosTextBox.TextAlign = HorizontalAlignment.Center;
             this.searchPhotosTextBox.Multiline = false;
             this.searchPhotosTextBox.WordWrap = false;
             this.searchPhotosTextBox.KeyDown += new KeyEventHandler(searchPhotosTextBox_KeyDown);
-            this.searchPhotosTextBox.TabIndex = 0;
+            this.searchPhotosTextBox.TabIndex = 2;
             //
             // previousPageButton
             //
-            this.previousPageButton.Location = new Point(322, 12);
-            this.previousPageButton.Size = new Size(40, 22);
+            this.previousPageButton.Location = new Point(12, 12);
+            this.previousPageButton.Size = new Size(70, 24);
             this.previousPageButton.Image = (Image) _resources.GetObject("$this.leftArrow");
             this.previousPageButton.ImageAlign = ContentAlignment.MiddleCenter;
             this.previousPageButton.UseCompatibleTextRendering = true;
             this.previousPageButton.UseVisualStyleBackColor = true;
-            this.previousPageButton.TabIndex = 1;
+            this.previousPageButton.TabIndex = 0;
             this.previousPageButton.Click += new EventHandler(this.previousPageButton_Click);
             //
             // nextPageButton
             //
-            this.nextPageButton.Location = new Point(583, 12);
-            this.nextPageButton.Size = new Size(40, 22);
+            this.nextPageButton.Location = new Point(80, 12);
+            this.nextPageButton.Size = new Size(70, 24);
             this.nextPageButton.Image = (Image) _resources.GetObject("$this.rightArrow");
             this.nextPageButton.ImageAlign = ContentAlignment.MiddleCenter;
             this.nextPageButton.UseCompatibleTextRendering = true;
             this.nextPageButton.UseVisualStyleBackColor = true;
-            this.nextPageButton.TabIndex = 3;
+            this.nextPageButton.TabIndex = 1;
             this.nextPageButton.Click += new EventHandler(this.nextPageButton_Click);
-            //
-            // refreshPhotosButton
-            //
-            this.refreshPhotosButton.Location = new Point(360, 12);
-            this.refreshPhotosButton.Size = new Size(225, 22);
-            this.refreshPhotosButton.Text = "RANDOM PHOTOS";
-            this.refreshPhotosButton.Font = new Font("Segoe UI", 8F, FontStyle.Bold);
-            this.refreshPhotosButton.TextAlign = ContentAlignment.TopCenter;
-            this.refreshPhotosButton.UseVisualStyleBackColor = true;
-            this.refreshPhotosButton.UseCompatibleTextRendering = true;
-            this.refreshPhotosButton.TabIndex = 2;
-            this.refreshPhotosButton.Click += new EventHandler(this.refreshPhotosButton_Click);
             //
             // addRemoveFavoriteButton
             //
-            this.addRemoveFavoriteButton.Location = new Point(633, 12);
-            this.addRemoveFavoriteButton.Size = new Size(30, 22);
+            this.addRemoveFavoriteButton.Location = new Point(462, 12);
+            this.addRemoveFavoriteButton.Size = new Size(30, 24);
             this.addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.add"), 12, 12);
             this.addRemoveFavoriteButton.ImageAlign = ContentAlignment.MiddleCenter;
             this.addRemoveFavoriteButton.UseCompatibleTextRendering = true;
             this.addRemoveFavoriteButton.UseVisualStyleBackColor = true;
-            this.addRemoveFavoriteButton.TabIndex = 4;
+            this.addRemoveFavoriteButton.TabIndex = 3;
             this.addRemoveFavoriteButton.Click += new EventHandler(this.addRemoveFavoriteButton_Click);
             //
             // showFavoritesButton
             //
-            this.showFavoritesButton.Location = new Point(661, 12);
-            this.showFavoritesButton.Size = new Size(243, 22);
+            this.showFavoritesButton.Location = new Point(490, 12);
+            this.showFavoritesButton.Size = new Size(102, 24);
             this.showFavoritesButton.Text = "Favorites";
             this.showFavoritesButton.Font = new Font("Segoe UI", 8F);
             this.showFavoritesButton.TextAlign = ContentAlignment.TopCenter;
             this.showFavoritesButton.UseVisualStyleBackColor = true;
             this.showFavoritesButton.UseCompatibleTextRendering = true;
-            this.showFavoritesButton.TabIndex = 5;
+            this.showFavoritesButton.TabIndex = 4;
             this.showFavoritesButton.Click += new EventHandler(this.showFavoritesButton_Click);
             //
             // aboutAppButton
             //
-            this.aboutAppButton.Font = new Font("Verdana", 9F, FontStyle.Bold);
-            this.aboutAppButton.Location = new Point(902, 12);
-            this.aboutAppButton.Size = new Size(32, 22);
-            this.aboutAppButton.Text = "i";
+            this.aboutAppButton.Location = new Point(590, 12);
+            this.aboutAppButton.Size = new Size(32, 24);
+            this.aboutAppButton.Text = "A";
+            this.aboutAppButton.Font = new Font("Segoe UI", 9F);
             this.aboutAppButton.UseCompatibleTextRendering = true;
             this.aboutAppButton.UseVisualStyleBackColor = true;
             this.aboutAppButton.TextAlign = ContentAlignment.TopCenter;
-            this.aboutAppButton.TabIndex = 6;
+            this.aboutAppButton.TabIndex = 5;
             this.aboutAppButton.Click += new EventHandler(this.aboutAppButton_Click);
             // 
             // photoLabel1
@@ -166,7 +152,7 @@ namespace Pixel.Forms
             this.photoLabel3.Name = "photoLabel3";
             this.photoLabel3.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
             this.photoLabel3.TextAlign = ContentAlignment.MiddleCenter;
-            this.photoLabel3.Location = new Point(633, 44);
+            this.photoLabel3.Location = new Point(12, 256);
             this.photoLabel3.Size = new Size(300, 200);
             this.photoLabel3.Click += new EventHandler(photoLabel3_Click);
             this.photoLabel3.Paint += new PaintEventHandler(this.photoLabel3_Paint);
@@ -176,7 +162,7 @@ namespace Pixel.Forms
             this.photoLabel4.Name = "photoLabel4";
             this.photoLabel4.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
             this.photoLabel4.TextAlign = ContentAlignment.MiddleCenter;
-            this.photoLabel4.Location = new Point(12, 256);
+            this.photoLabel4.Location = new Point(322, 256);
             this.photoLabel4.Size = new Size(300, 200);
             this.photoLabel4.Click += new EventHandler(photoLabel4_Click);
             this.photoLabel4.Paint += new PaintEventHandler(this.photoLabel4_Paint);
@@ -186,7 +172,7 @@ namespace Pixel.Forms
             this.photoLabel5.Name = "photoLabel5";
             this.photoLabel5.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
             this.photoLabel5.TextAlign = ContentAlignment.MiddleCenter;
-            this.photoLabel5.Location = new Point(322, 256);
+            this.photoLabel5.Location = new Point(12, 468);
             this.photoLabel5.Size = new Size(300, 200);
             this.photoLabel5.Click += new EventHandler(photoLabel5_Click);
             this.photoLabel5.Paint += new PaintEventHandler(this.photoLabel5_Paint);
@@ -196,7 +182,7 @@ namespace Pixel.Forms
             this.photoLabel6.Name = "photoLabel6";
             this.photoLabel6.Anchor = (AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right);
             this.photoLabel6.TextAlign = ContentAlignment.MiddleCenter;
-            this.photoLabel6.Location = new Point(633, 256);
+            this.photoLabel6.Location = new Point(322, 468);
             this.photoLabel6.Size = new Size(300, 200);
             this.photoLabel6.Click += new EventHandler(photoLabel6_Click);
             this.photoLabel6.Paint += new PaintEventHandler(this.photoLabel6_Paint);
@@ -206,12 +192,11 @@ namespace Pixel.Forms
             this.components = new Container();
             this.AutoScaleMode = AutoScaleMode.Font;
             this.BackColor = Color.White;
-            this.ClientSize = new Size(946, 488);
+            this.ClientSize = new Size(634, 700);
             this.Controls.Add(this.statusBar);
             this.Controls.Add(this.searchPhotosTextBox);
             this.Controls.Add(this.previousPageButton);
             this.Controls.Add(this.nextPageButton);
-            this.Controls.Add(this.refreshPhotosButton);
             this.Controls.Add(this.addRemoveFavoriteButton);
             this.Controls.Add(this.showFavoritesButton);
             this.Controls.Add(this.aboutAppButton);
@@ -226,7 +211,8 @@ namespace Pixel.Forms
             this.Text = Application.ProductName;
             this.ResumeLayout(false);
             this.FormBorderStyle = FormBorderStyle.FixedDialog;
-            this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - this.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2);
+            //this.Location = new Point((Screen.PrimaryScreen.WorkingArea.Width - this.Width) / 2, (Screen.PrimaryScreen.WorkingArea.Height - this.Height) / 2);
+            CenterToScreen();
         }
 
         #endregion
@@ -235,7 +221,6 @@ namespace Pixel.Forms
         private TextBox searchPhotosTextBox;
         private Button previousPageButton;
         private Button nextPageButton;
-        private Button refreshPhotosButton;
         private Button addRemoveFavoriteButton;
         private Button showFavoritesButton;
         private Button aboutAppButton;
