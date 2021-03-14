@@ -6,12 +6,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Pixel.Encryption;
-using Pixel.Util;
+using Pixel.Utils;
 using Unsplasharp;
 
 namespace Pixel.Forms
 {
-    public partial class Initial : Form
+    public partial class InitialForm : Form
     {
         private static readonly UnsplasharpClient _client = new UnsplasharpClient(AES.Decrypt(
             "/JKkbIdAWvZXGGQk5hcjtonTgGYPeRHOBrR0ZreaCroiLWfgcPF0qv/Gl/gmlBkD/B8eSPVjkD4YjZe8tGiRWTuHWe8am/v8l4mGtF1zAAI=",
@@ -21,16 +21,16 @@ namespace Pixel.Forms
         {
             try
             {
-                var photos =  await _client.ListPhotos(1, 6);
+                var photos =  await _client.ListPhotos(1, 4);
                 var images = new List<Image>();
                 await Task.Run(() =>
                 {
-                    for (var i = 0; i < 6; i++)
+                    for (var i = 0; i < 4; i++)
                     {
                         images.Add(Task.Run(() => HttpUtil.StreamUrlToImage(photos[i].Urls.Small)).Result);
                     }
                     
-                    var appMainThread = new Thread(() => new Main(photos, images).ShowDialog());
+                    var appMainThread = new Thread(() => new MainForm(photos, images).ShowDialog());
                     appMainThread.SetApartmentState(ApartmentState.STA);
                     appMainThread.Start();
                     Application.Exit();
@@ -43,8 +43,6 @@ namespace Pixel.Forms
                 Application.Exit();
             }
         }
-        
-        //
         
         protected override CreateParams CreateParams
         {
@@ -92,7 +90,7 @@ namespace Pixel.Forms
                 }
                 API.DeleteDC(memDc);
             }
-            catch (Exception)
+            catch
             {
                 // ignored
             }
@@ -102,10 +100,8 @@ namespace Pixel.Forms
         {
             UpdateFormDisplay(BackgroundImage);
         }
-
-        //
         
-        public Initial()
+        public InitialForm()
         {
             InitializeComponent();
             HttpUtil.InitHttpClient();

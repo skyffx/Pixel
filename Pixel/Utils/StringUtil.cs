@@ -1,4 +1,4 @@
-﻿namespace Pixel.Util
+﻿namespace Pixel.Utils
 {
     public static class StringUtil
     {

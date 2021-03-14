@@ -3,7 +3,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 
-namespace Pixel.Util
+namespace Pixel.Utils
 {
     public static class ImageUtil
     {

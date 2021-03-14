@@ -14,7 +14,7 @@ namespace Pixel
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new Initial());
+            Application.Run(new InitialForm());
         }
     }
 }

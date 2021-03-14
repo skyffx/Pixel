@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Pixel.Extensions;
 
-namespace Pixel.Util
+namespace Pixel.Utils
 {
     public static class HttpUtil
     {

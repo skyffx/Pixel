@@ -9,13 +9,13 @@ using System.Windows.Forms;
 using Pixel.Common;
 using Pixel.Encryption;
 using Pixel.Extensions;
-using Pixel.Util;
+using Pixel.Utils;
 using Unsplasharp;
 using Unsplasharp.Models;
 
 namespace Pixel.Forms
 {
-    public partial class Main : Form
+    public partial class MainForm : Form
     {
         private readonly UnsplasharpClient _client = new UnsplasharpClient(AES.Decrypt(
             "/JKkbIdAWvZXGGQk5hcjtonTgGYPeRHOBrR0ZreaCroiLWfgcPF0qv/Gl/gmlBkD/B8eSPVjkD4YjZe8tGiRWTuHWe8am/v8l4mGtF1zAAI=",
@@ -35,6 +35,7 @@ namespace Pixel.Forms
         private List<string> _favorites;
         private int _favoritesCounter;
         private string _author;
+        private bool _isFavoriteSaved;
 
         private IEnumerable<Label> GetPhotoLabels()
         {
@@ -47,7 +48,7 @@ namespace Pixel.Forms
         {
             Dictionary.Clear();
             statusBar.Text = null;
-            _photoLabelId = 6;
+            _photoLabelId = 4;
             var photoLabels = GetPhotoLabels();
             
             foreach (var (photoLabel, i) in IndexExtension.LoopIndex(photoLabels))
@@ -82,7 +83,7 @@ namespace Pixel.Forms
             if (_photos.ElementAtOrDefault(_photoLabelId) != null)
             {
                 var photo = _photos[_photoLabelId];
-                statusBar.Text = "	" + $"{photo.Description.Truncate(65, "...")} — by {photo.User.Name} — {photo.Width}(w)*{photo.Height}(h)";
+                statusBar.Text = "	" + $"{photo.Description.Truncate(180, "...")} — by {photo.User.Name} — {photo.Width}(w)*{photo.Height}(h)";
             }
             else
             {
@@ -93,8 +94,7 @@ namespace Pixel.Forms
         private async void GetPhotos(int page)
         {
             EnableControls(false);
-            addRemoveFavoriteButton.Enabled = true;
-            _photos = await _client.ListPhotos(page, 6);
+            _photos = await _client.ListPhotos(page, 4);
             DisplayPhotos();
         }
 
@@ -103,21 +103,21 @@ namespace Pixel.Forms
             EnableControls(false);
             _mainPageCounter = 1;
             _photos.Clear();
-            _photos = await _client.GetRandomPhoto(6);
+            _photos = await _client.GetRandomPhoto(4);
             DisplayPhotos();
         }
 
         private async void GetSearchedPhotos(int page)
         {
             EnableControls(false);
-            _photos = await _client.SearchPhotos(_searchQuery, page, 6);
+            _photos = await _client.SearchPhotos(_searchQuery, page, 4);
             DisplayPhotos();
         }
 
         private async void GetAuthorsPhotos(string author, int page)
         {
             EnableControls(false);
-            _photos = await _client.ListUserPhotos(author, page, 6);
+            _photos = await _client.ListUserPhotos(author, page, 4);
             DisplayPhotos();
         }
         
@@ -187,7 +187,6 @@ namespace Pixel.Forms
                     RefreshPhotoLabels();
                     GetPhotos(1);
                     _isShowFavoritesButtonClicked = false;
-                    addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.add"), 12, 12);
                 }
             }
         }
@@ -200,7 +199,7 @@ namespace Pixel.Forms
             
             for (var f = _favoritesCounter; f < _favorites.Count; f++)
             {
-                if (i.Equals(6))
+                if (i.Equals(4))
                 {
                     break;
                 }
@@ -219,9 +218,17 @@ namespace Pixel.Forms
             {
                 if (Favorites.CountFavorites() > 0)
                 {
-                    if (_photos[_photoLabelId] != null)
+                    try
                     {
-                        addRemoveFavoriteButton.Enabled = _favorites.All(favoriteId => favoriteId != _photos[_photoLabelId].Id);
+                        if (_photos[_photoLabelId] != null)
+                        {
+                            _isFavoriteSaved = _favorites.All(favoriteId => favoriteId != _photos[_photoLabelId].Id);
+
+                        }
+                    }
+                    catch 
+                    {
+                        // ignored
                     }
                 }
             }
@@ -233,6 +240,9 @@ namespace Pixel.Forms
             photoContextMenu.MenuItems.Add("Preview photo", previewPhotoMenuItem_Click);
             photoContextMenu.MenuItems.Add("View photo", viewPhotoMenuItem_Click);
             photoContextMenu.MenuItems.Add("-");
+            photoContextMenu.MenuItems.Add("Add photo to favorites", addFavoriteMenuItem_Click);
+            photoContextMenu.MenuItems.Add("Remove photo from favorites", removeFavoriteMenuItem_Click);
+            photoContextMenu.MenuItems.Add("-");
             photoContextMenu.MenuItems.Add("Show all photos (author)", showAuthorPhotos_Click);
 
             var photoLabels = GetPhotoLabels();
@@ -241,13 +251,12 @@ namespace Pixel.Forms
                 photoLabel.ContextMenu = photoContextMenu;
             }
             
-            var buttonContextMenu = new ContextMenu();
-            buttonContextMenu.MenuItems.Add("Go to first page (home)", goToFirstPageMenuItem_Click);
-            buttonContextMenu.MenuItems.Add("Go to current page (home)", goToPageMenuItem_Click);
-            buttonContextMenu.MenuItems.Add("Delete 'photos' directory", deleteTempDirMenuItem_Click);
-            buttonContextMenu.MenuItems.Add("Refresh your favorites", refreshFavoritesMenuItem_Click);
-            nextPageButton.ContextMenu = buttonContextMenu;
-            previousPageButton.ContextMenu = buttonContextMenu;
+            var mainContextMenu = new ContextMenu();
+            mainContextMenu.MenuItems.Add("Go to first page (home)", goToFirstPageMenuItem_Click);
+            mainContextMenu.MenuItems.Add("Go to current page (home)", goToPageMenuItem_Click);
+            mainContextMenu.MenuItems.Add("Delete 'photos' directory", deleteTempDirMenuItem_Click);
+            mainContextMenu.MenuItems.Add("Refresh your favorites", refreshFavoritesMenuItem_Click);
+            ContextMenu = mainContextMenu;
             
             var statusBarContextMenu = new ContextMenu();
             statusBarContextMenu.MenuItems.Add("Show full description", showFullDescriptionMenuItem_Click);
@@ -256,14 +265,11 @@ namespace Pixel.Forms
         
         private void EnableControls(bool state)
         {
-            previousPageButton.Enabled = state;
-            nextPageButton.Enabled = state;
-            addRemoveFavoriteButton.Enabled = state;
+            previousPageLabel.Enabled = state;
+            nextPageLabel.Enabled = state;
             showFavoritesButton.Enabled = state;
             searchPhotosTextBox.Focus();
         }
-        
-        //
         
         private void searchPhotosTextBox_KeyDown(object sender, KeyEventArgs e)
         {
@@ -286,27 +292,26 @@ namespace Pixel.Forms
                     _isSearched = true;
                 }
                 _isShowFavoritesButtonClicked = false;
-                addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.add"), 12, 12);
             }
         }
 
-        private void previousPageButton_Click(object sender, EventArgs e)
+        private void previousPageLabel_Click(object sender, EventArgs e)
         {
             RefreshPhotoLabels();
 
             if (_isShowFavoritesButtonClicked)
             {
-                if (_favorites.Count > 6)
+                if (_favorites.Count > 4)
                 {
-                    if (_favoritesCounter.Equals(6))
+                    if (_favoritesCounter.Equals(4))
                     {
-                        previousPageButton.Enabled = false;
-                        nextPageButton.Select();
+                        previousPageLabel.Enabled = false;
+                        nextPageLabel.Select();
                     }
                     else
                     {
-                        nextPageButton.Enabled = true;
-                        _favoritesCounter -= _photos.Count + 6;
+                        nextPageLabel.Enabled = true;
+                        _favoritesCounter -= _photos.Count + 4;
                         ShowFavorites();
                     }
                 }
@@ -339,7 +344,7 @@ namespace Pixel.Forms
             }
         }
 
-        private void nextPageButton_Click(object sender, EventArgs e)
+        private void nextPageLabel_Click(object sender, EventArgs e)
         {
             RefreshPhotoLabels();
 
@@ -355,9 +360,9 @@ namespace Pixel.Forms
             {
                 if (_isShowFavoritesButtonClicked)
                 {
-                    if (!previousPageButton.Enabled)
+                    if (!previousPageLabel.Enabled)
                     {
-                        previousPageButton.Enabled = true;
+                        previousPageLabel.Enabled = true;
                     }
 
                     if (_favoritesCounter != _favorites.Count)
@@ -366,8 +371,8 @@ namespace Pixel.Forms
                     }
                     else
                     {
-                        nextPageButton.Enabled = false;
-                        previousPageButton.Select();
+                        nextPageLabel.Enabled = false;
+                        previousPageLabel.Select();
                     }
                 }
                 else
@@ -377,24 +382,36 @@ namespace Pixel.Forms
             }
         }
 
-        private void addRemoveFavoriteButton_Click(object sender, EventArgs e)
+        private void addFavoriteMenuItem_Click(object sender, EventArgs e)
         {
-            if (!_isShowFavoritesButtonClicked)
+            if (!_isFavoriteSaved)
             {
-                if (_photos.ElementAtOrDefault(_photoLabelId) != null)
-                {
-                    var id = _photos[_photoLabelId].Id;
-                    Favorites.AddFavorite(id);
-                    CountFavorites();
-                    CheckFavorite();
-                }
-                else
-                {
-                    MessageBox.Show("Please to select a photo.",
-                        $"—{Application.ProductName}—", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                }
+                MessageBox.Show("This photo already exists in your collection.",
+                    $"—{Application.ProductName}—", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             else
+            {
+                if (!_isShowFavoritesButtonClicked)
+                {
+                    if (_photos.ElementAtOrDefault(_photoLabelId) != null)
+                    {
+                        var id = _photos[_photoLabelId].Id;
+                        Favorites.AddFavorite(id);
+                        CountFavorites();
+                        CheckFavorite();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Please to select a photo.",
+                            $"—{Application.ProductName}—", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    }
+                }   
+            }
+        }
+
+        private void removeFavoriteMenuItem_Click(object sender, EventArgs e)
+        {
+            if (_isShowFavoritesButtonClicked)
             {
                 if (_photos.ElementAtOrDefault(_photoLabelId) != null)
                 {
@@ -407,6 +424,11 @@ namespace Pixel.Forms
                     MessageBox.Show("Please to select a photo.",
                         $"—{Application.ProductName}—", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
+            }
+            else
+            {
+                MessageBox.Show("To proceed switch to Favorites.",
+                    $"—{Application.ProductName}—", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
         }
 
@@ -422,8 +444,6 @@ namespace Pixel.Forms
             {
                 _photos.Clear();
                 _isShowFavoritesButtonClicked = true;
-                addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.remove"), 12, 12);
-                addRemoveFavoriteButton.Enabled = true;
                 _favorites.Reverse();
                 ShowFavorites();
             }
@@ -447,13 +467,12 @@ namespace Pixel.Forms
                 TextAlign = ContentAlignment.TopCenter,
                 Text = $"{Application.ProductName} {Application.ProductVersion.Remove(3)}\r\n\r\n" +
                        "Made with love for all by skyffx\r\n" +
-                       "(Wojciech Piekielniak, wojciech.piekielniak@protonmail.com)\r\n\r\n" +
                        "github.com/skyffx/Pixel\r\n\r\n" +
                        "This amazing app is based on:\r\n" +
                        "Unsplasharp — github.com/rootasjey/unsplasharp\r\n" +
                        "TinyJson — github.com/zanders3/json\r\n\r\n" +
                        "App icon from flaticon.com\r\n\r\n\r\n" +
-                       "—2020—"
+                       "—2021—"
             };
             
             var about = new Form
@@ -466,13 +485,14 @@ namespace Pixel.Forms
                 ShowInTaskbar = false,
                 Text = $"—{Application.ProductName}—",
                 FormBorderStyle = FormBorderStyle.FixedDialog,
-                Size = new Size(400, 480),
+                Size = new Size(400, 460),
+                StartPosition = FormStartPosition.CenterParent
             };
-            
-            about.ShowDialog();
-        }
 
-        //
+            Enabled = false;
+            about.ShowDialog(this);
+            Enabled = true;
+        }
 
         private void photoLabel1_Click(object sender, EventArgs e)
         {
@@ -505,25 +525,7 @@ namespace Pixel.Forms
             DisplayPhotoInfo();
             CheckFavorite();
         }
-        
-        private void photoLabel5_Click(object sender, EventArgs e)
-        {
-            _photoLabelId = 4;
-            RefreshPhotoLabel(photoLabel5.Name);
-            DisplayPhotoInfo();
-            CheckFavorite();
-        }
-        
-        private void photoLabel6_Click(object sender, EventArgs e)
-        {
-            _photoLabelId = 5;
-            RefreshPhotoLabel(photoLabel6.Name);
-            DisplayPhotoInfo();
-            CheckFavorite();
-        }
-        
-        //
-        
+
         private void PrintFavoriteStar(PaintEventArgs e)
         {
             e.Graphics.DrawImage(new Bitmap((Image) _resources.GetObject("$this.star")), 266, 10);
@@ -552,21 +554,7 @@ namespace Pixel.Forms
             PrintPhotoLabelBorder(photoLabel4, _borderColor, _borderThickness, e);
             if (!Dictionary.Get(3)) { PrintFavoriteStar(e); }
         }
-        
-        private void photoLabel5_Paint(object sender, PaintEventArgs e)
-        {
-            PrintPhotoLabelBorder(photoLabel5, _borderColor, _borderThickness, e);
-            if (!Dictionary.Get(4)) { PrintFavoriteStar(e); }
-        }
-        
-        private void photoLabel6_Paint(object sender, PaintEventArgs e)
-        {
-            PrintPhotoLabelBorder(photoLabel6, _borderColor, _borderThickness, e);
-            if (!Dictionary.Get(5)) { PrintFavoriteStar(e); }
-        }
-        
-        //
-        
+
         private void previewPhotoMenuItem_Click(object sender, EventArgs e)
         {
             if (_photos.ElementAtOrDefault(_photoLabelId) != null)
@@ -589,9 +577,13 @@ namespace Pixel.Forms
                     ShowInTaskbar = false,
                     Text = $"—{Application.ProductName}—",
                     FormBorderStyle = FormBorderStyle.FixedDialog,
-                    Size = new Size(previewPhoto.Width, previewPhoto.Height)
+                    Size = new Size(previewPhoto.Width, previewPhoto.Height),
+                    StartPosition = FormStartPosition.CenterParent
                 };
-                preview.ShowDialog();
+
+                Enabled = false;
+                preview.ShowDialog(this);
+                Enabled = true;
             }
             else
             {
@@ -620,7 +612,6 @@ namespace Pixel.Forms
         
         private void goToFirstPageMenuItem_Click(object sender, EventArgs e)
         {
-            addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.add"), 12, 12);
             _isShowFavoritesButtonClicked = false;
             _isSearched = false;
             _isAuthorCollectionShown = false;
@@ -630,7 +621,6 @@ namespace Pixel.Forms
         
         private void goToPageMenuItem_Click(object sender, EventArgs e)
         {
-            addRemoveFavoriteButton.Image = ImageUtil.ResizeImageAndKeepRatio((Image) _resources.GetObject("$this.add"), 12, 12);
             _isShowFavoritesButtonClicked = false;
             _isSearched = false;
             _isAuthorCollectionShown = false;
@@ -641,9 +631,6 @@ namespace Pixel.Forms
         {
             if (Directory.Exists("photos"))
             {
-                /*var dirSize = Directory.GetFiles("photos", "*", SearchOption.AllDirectories)
-                    .Sum(t => new FileInfo(t).Length);*/
-                
                 var selectedOption = MessageBox.Show("Are you sure?",
                     $"—{Application.ProductName}—", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (selectedOption.Equals(DialogResult.Yes))
@@ -659,6 +646,8 @@ namespace Pixel.Forms
 
         private void refreshFavoritesMenuItem_Click(object sender, EventArgs e)
         {
+            Enabled = false;
+            
             try
             {
                 if (_favorites.Count > 0)
@@ -698,6 +687,8 @@ namespace Pixel.Forms
             {
                 // ignored
             }
+
+            Enabled = true;
         }
 
         private void showFullDescriptionMenuItem_Click(object sender, EventArgs e)
@@ -729,21 +720,18 @@ namespace Pixel.Forms
         {
             statusBar.Text = "	" + $"— {(int)progress}% —";
         }
-
-        //
         
-        private void ShowTips()
+        private void AppTips()
         {
             var toolTip = new ToolTip {AutoPopDelay = 4000, InitialDelay = 100, ReshowDelay = 100, ShowAlways = true};
             toolTip.SetToolTip(searchPhotosTextBox, "Type #random to show random photos");
-            toolTip.SetToolTip(previousPageButton, "Go to previous page\nMouse right click for more options");
-            toolTip.SetToolTip(nextPageButton, "Go to next page\nMouse right click for more options");
-            toolTip.SetToolTip(addRemoveFavoriteButton, "Add photo to favorites\nRemove photo from favorites");
-            toolTip.SetToolTip(showFavoritesButton, "Show saved favorites");
+            toolTip.SetToolTip(previousPageLabel, "Go to previous page");
+            toolTip.SetToolTip(nextPageLabel, "Go to next page");
+            toolTip.SetToolTip(showFavoritesButton, "Show favorites");
             toolTip.SetToolTip(aboutAppButton, $"About {Application.ProductName}");
         }
         
-        public Main(List<Photo> photos, List<Image> images)
+        public MainForm(List<Photo> photos, List<Image> images)
         {
             CenterToScreen();
             InitializeComponent();
@@ -753,7 +741,7 @@ namespace Pixel.Forms
             _images = images;
             DisplayPhotos();
             CountFavorites();
-            ShowTips();
+            AppTips();
             Select();
         }
 

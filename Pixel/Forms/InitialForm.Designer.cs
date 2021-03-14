@@ -1,14 +1,14 @@
 ﻿using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using Pixel.Util;
+using Pixel.Utils;
 
 namespace Pixel.Forms
 {
-    partial class Initial
+    partial class InitialForm
     {
         private readonly ComponentResourceManager _resources =
-            new ComponentResourceManager(typeof(Main));
+            new ComponentResourceManager(typeof(MainForm));
         
         /// <summary>
         /// Required designer variable.

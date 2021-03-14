@@ -16,7 +16,7 @@
 
 #### Current status
 
-* stable (25-Dec-20)
+* stable (14-Mar-21)
 
 #### Used modules
 
