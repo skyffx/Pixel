@@ -12,6 +12,7 @@
 	<img src="screenshot.png?raw=true" />
 </p>
 
+<br/>
 
 #### Current status
 
