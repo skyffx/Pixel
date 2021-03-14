@@ -12,8 +12,6 @@
 	<img src="screenshot.png?raw=true" />
 </p>
 
-<br/>
-
 #### Current status
 
 * stable (14-Mar-21)
