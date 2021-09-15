@@ -30,7 +30,7 @@
 
 ## Downlaod
 
-* [App](https://github.com/skyffx/Pixel/releases)
+* [App](https://github.com/skyffx/Pixel/releases/download/v2.0/Pixel-2.0.zip)
 
 ## License
 
